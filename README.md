@@ -1,1 +1,1 @@
-# mcmm
+# Monte Carlo methods for mortals
