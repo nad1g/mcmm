@@ -9,9 +9,9 @@
 \maketitle
 \pagebreak
 \section{Introduction}
-Here's a scenario: assume that you are playing solitaire (the card game) and wondering what's the probability of a successful outcome? Well, this was a question that occurred to Stan Ulam (the Polish mathematician) who was recovering from illness and playing solitaire to while away his time. He tried to solve it using combinatorics and failed. Finally, he thought of simulating a very large number of games (with cards shuffled at random, of course) and just counting the number of successes. He, and his friend, Von Neumann, who knew a thing or two about computers and programming, set out do this calculation and eventually used this method for scientific purposes.
+Here's a scenario: assume that you are playing solitaire (the card game) and wondering what's the probability of a successful outcome? Well, this was a question that occurred to Stan Ulam (the Polish mathematician) who was recovering from illness and playing solitaire to while away his time. He tried to solve it using combinatorics and failed. Finally, he thought of simulating a very large number of games (with cards shuffled at random, of course) and just counting the number of successes. He, and his friend, Von Neumann, who knew a thing or two about computers and programming, set out do this calculation and eventually used this method for other scientific purposes.
 
-This is the central idea of MC. Use randomness to "simulate" a large number of experiments. Infer / calculate a quantity based on the outcome of the experiments. More the number of experiments, the better!
+This is the central idea of MC. Use randomness to "simulate" a large number of experiments. Infer / calculate a quantity of interest based on the outcome of the experiments. More the number of experiments, the better!
 
 What are Monte Carlo (MC) methods? An (over)simplified view is that they are tools for:
 \begin{enumerate}
@@ -35,26 +35,26 @@ where $p(x)$ is the probability density function (pdf). Assume that $p(x)$ is a 
 So, in theory, we can "determine" the expected value simply by performing the integration. However, given $N$ realizations $x_1,\dots,x_N$ of $X$, we can "estimate" 
 the expected value (and hence, the integral) as
 \[
-E[X] = m =  \int x p(x) dx \approx \frac{1}{N} \sum_{i=1}^N x_i.
+E[X] = m =  \int x p(x)~ dx \approx \frac{1}{N} \sum_{i=1}^N x_i.
 \] 
 The estimate gets better (closer to $m$) as the number of samples, N, increases.
 
 The above idea might not be a revelation. But, let us assume that we have an integral of the kind:
 \[
-\int  g(x) f(x) dx ,
+\int  g(x) \cdot f(x)~ dx ,
 \]
 
-% where f(x) is a pdf (i.e., f(x) >= 0 for all x and integral (f(x) dx) = 1)
-% 
-% If g(x) = x, we obtain the expected value; If g(x) = x^2, we obtain the 
-% "variance", etc. These quantities are very useful - for example, the expected 
-% value represents the best estimate of the random variable X and the variance 
-% gives how confident we are of the estimate.
-% 
-% *Key idea: MC method says:
-% 
-% integral ( g(x) f(x) dx ) approx = 1/N sum( g(x'_1) , g(x'_2) , ... , g(x'_N) )
-% where x'_1, x'_2,... are "sampled" from the pdf f(x).
+where $f(x)$ is a pdf (i.e., $f(x) \ge 0$ for all $x$ and $\int f(x)~dx = 1$.
+For instance, if $g(x) = x$, we obtain the expected value; And, if $g(x) = x^2$, we obtain the 
+"variance", etc. These quantities are very useful - for example, the expected 
+ value represents the best estimate of the random variable X and the variance 
+ gives how confident we are of the estimate.
+
+{\bf I1: MC method says:}
+\[
+\int g(x) \cdot f(x) ~ dx \approx \frac{1}{N} \sum_i g(x'_i)
+\]
+where $x'_1, x'_2,\dots$ are "sampled" from the pdf $f(x)$.
 % 
 % **** Example ****
 % What do we mean by sampling from a pdf? Let's consider a simple example. Suppose 
