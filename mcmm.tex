@@ -28,21 +28,26 @@ What is a random variable? As someone said, it is neither random nor variable. F
 
 The expected value (mean, for ordinary mortals) of a random variable, $X$, is defined as
 \[
-E[X] = \int x p(x) dx,
+E[X] = \int x~ p(x)~ dx,
 \]
-where $p(x)$ is the probability density function (pdf). Assume that $p(x)$ is a ``normally distributed'' (bell curve) with mean $m$ and standard deviation $\sigma$. What it means is that if you plot a histogram of  $x_1, x_2, \dots $, it resembles the bell shape centered around  $m$ and its width $\propto \sigma$.
-
-So, in theory, we can "determine" the expected value simply by performing the integration. However, given $N$ realizations $x_1,\dots,x_N$ of $X$, we can "estimate" 
-the expected value (and hence, the integral) as
+where $p(x)$ is the probability density function (pdf). Assume that $p(x)$ represents a Normal distribution (or Gaussian distribution) with mean $m$ and standard deviation $\sigma$. Thus, the probability $P(X = x) = p(x)$ is given by
 \[
-E[X] = m =  \int x p(x)~ dx \approx \frac{1}{N} \sum_{i=1}^N x_i.
+ p(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp\biggl({-(x-m)^2/(2\sigma^2)}\biggr).
+\]
+What it means is that if you plot a histogram of  $x_1, x_2, \dots $, it resembles the bell shape centered around  $m$ and its width $\propto \sigma$.
+
+Assume that the unknown expected value $m$ is to be estimated given $N$ realizations $x_1,\dots,x_N$ of $X$. We could estimate $m$ (and hence, the integral) simply as a weighted sum of the realizations [it can proven that this is indeed the maximum likelihood estimate of $m$, but I will skip the derivation].
+\[
+E[X] = m =  \int x~ p(x)~ dx \approx \frac{1}{N} \sum_{i=1}^N x_i.
 \] 
 The estimate gets better (closer to $m$) as the number of samples, N, increases.
 
 The above idea might not be a revelation. But, let us assume that we have an integral of the kind:
-\[
+\begin{align}
 \int  g(x) \cdot f(x)~ dx ,
-\]
+\label{eq:gxfx}
+\end{align}
+
 
 where $f(x)$ is a pdf (i.e., $f(x) \ge 0$ for all $x$ and $\int f(x)~dx = 1$.
 For instance, if $g(x) = x$, we obtain the expected value; And, if $g(x) = x^2$, we obtain the 
@@ -55,9 +60,66 @@ For instance, if $g(x) = x$, we obtain the expected value; And, if $g(x) = x^2$,
 \int g(x) \cdot f(x) ~ dx \approx \frac{1}{N} \sum_i g(x'_i)
 \]
 where $x'_1, x'_2,\dots$ are "sampled" from the pdf $f(x)$.
-% 
-% **** Example ****
-% What do we mean by sampling from a pdf? Let's consider a simple example. Suppose 
-% we have a "bent coin" which has a probability of coming up heads = 0.7 and 
-% coming up tails = 0.3.
+
+\subsection{Sampling}
+What do we mean by ``sampling'' from a distribution? It means drawing realizations from a given pdf. Let's consider an example:
+Suppose we have a "bent coin" which has a probability of coming up heads = 0.7 and coming up tails = 0.3. A sample is simply the result of a toss. Now, if we sampled long enough; that is, if we tossed the bent coin many times and observed the results (realizations) and plotted a histogram (normalized), then, we'd see that almost 70\% of the coin tosses came up heads and the remaining 30\% or so came up tails. A Python script to simulate such a coin is shown below:
+
+\begin{verbatim}
+"""
+Simlate a biased coin
+"""
+
+import numpy as np
+
+class biased_coin:
+    """ biased_ is a class that implements a biased coin with
+        probability of heads = p, probability of tails = 1-p """
+    def __init__(self, p):
+        self.p = p
+      
+    def toss(self):
+        """ generate a single toss of the biased coin """  
+        if np.random.rand() > self.p:
+            return 'T'
+        else:
+            return 'H'
+
+    def get_sequence(self,num_tosses):
+        
+        seq = [self.toss() for i in range(num_tosses)]
+        return seq
+        
+        
+def main():
+    p = 0.7 # probability of heads
+    c = biased_coin(0.7);
+    tosses = c.get_sequence(100);
+    num_heads = tosses.count('H')
+    num_tails = tosses.count('T')
+    print ("simulated 100 tosses of a biased coin with p = " + str(p))
+    print ("obtained " + str(num_heads) + " heads and " + str(num_tails) + " tails")
+
+
+
+if __name__ == '__main__':
+    main()
+    
+    
+----- Sample Output -----
+simulated 100 tosses of a biased coin with p = 0.7
+obtained 71 heads and 29 tails
+
+\end{verbatim}
+
+A key observation in the above program is the following: we first sample from a uniform distribution (a random number that has the same probability of assuming any value between 0 and 1.0). This is provided by the function {\texttt{np.random.rand()}}. This random variable is then used to determine whether the appropriate result of the coin toss shall be heads or tails. If the random number is $> p (= 0.7)$, then the outcome is tails; otherwise heads. So, about 70\% of the coin tosses result in heads as expected.
+
+{\bf I2: Random variables from a uniform distribution are ``translated'' to another desired distribution}. 
+
+This translation is a key feature of MC methods. There are a plethora of methods that achieve this (e.g., inverse transform sampling, rejection sampling, etc etc). But, the basic idea is that random variables from one distribution is used to generate random variables of another (desired) distribution.
+
+The above example had a discrete pdf (a probabilty mass function (pmf)). If we assume a continuous pdf (such as a Normal distribution), then, the histogram of the samples would resemble a ``bell curve''.
+
+\subsection{Recap}
+Just a quick recap; the first idea ({\bf I1}) says that integrals of the kind (\ref{eq:gxfx}) can be approximated by averaging $g(x)$ s evaluated at $x$s drawn from the pdf $f(x)$. The second idea ({\bf I2}) says that samples from one distribution (such as uniform distribution, which is provided as a standard library in most OSes) can be used to generate samples from another distribution.
 \end{document}
