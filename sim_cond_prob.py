@@ -77,7 +77,7 @@ if __name__ == '__main__':
             For doing this the "Monte Carlo" way, we first
             simulate a bunch of 'x's according to p(x)
             and for each x, we simulate a bunch of 'y's according
-            to p(x|y). Finally, a histogram should give us the
+            to p(y|x). Finally, a histogram should give us the
             desired answer
     """
     x = sample(x_labels, p_x, 10000)

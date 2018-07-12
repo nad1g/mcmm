@@ -122,4 +122,52 @@ The above example had a discrete pdf (a probabilty mass function (pmf)). If we a
 
 \subsection{Recap}
 Just a quick recap; the first idea ({\bf I1}) says that integrals of the kind (\ref{eq:gxfx}) can be approximated by averaging $g(x)$ s evaluated at $x$s drawn from the pdf $f(x)$. The second idea ({\bf I2}) says that samples from one distribution (such as uniform distribution, which is provided as a standard library in most OSes) can be used to generate samples from another distribution.
+
+\subsection{Conditional Probabilty}
+In this section, we explore how to generate samples from a pdf as a function of other pdfs. I will use the term probability density function (which, if you remember, is applicable to a continuous random variable) instead of probability mass function (of a discrete random variable) just for convinience. I know that this violates mathematical rigour, but it is worth the sacrifice (in my opinion).
+Assume that we are given samples from a pdf $p(x)$ and we know the conditional pdf $p(y|x)$. Our task is to generate samples from the pdf $p(y)$. So, say that we have samples $x_1, x_2, \dots, x_N$ from the pdf:
+\begin{align}
+ p(x) = \begin{cases}
+         0.6, & x = 1. \\
+         0.4, & x = 2.
+        \end{cases}
+\end{align}
+We are also given the conditional probabilities:
+\begin{align}
+ p(y|x = 1) &= \begin{cases}
+         0.1, & y = 1. \\
+         0.9, & y = 2.
+        \end{cases} \\
+ p(y|x = 2) &= \begin{cases}
+         0.7, & y = 1. \\
+         0.3, & y = 2.
+        \end{cases}
+\end{align}
+\footnote{Digression: Althought this is an artificial toy example, it bears resemblance to a binary assymetric channel where $y$ can be thought of as the received signal.}
+Now, the first task is to draw samples from the distribution $p(y)$. One way to approach this task is to estimate $p(x)$ (call it $\hat p(x)$) using the samples $x_1,\dots,x_N$ and then apply a simple formula to calculate $p(y)$ as:
+\begin{align}
+ p(y = 1) &= p(y = 1|x = 1) \cdot \hat p(x = 1) + p(y = 1|x = 2)\cdot \hat p(x = 2) \\
+ p(y = 2) &= p(y = 2|x = 1) \cdot \hat p(x = 1) + p(y = 2|x = 2)\cdot \hat p(x = 2)
+\end{align}
+and then, sample from $p(y)$ as before. Another approach is to do the following:
+For each $x_i$, simulate $M$ samples of $y$s (i.e., $y_1, y_2, \dots, y_M$) using the conditional probability $p(y|x_i)$. Thus, we end up with $M\cdot N$ samples of $y$ which are essentially distributed as $p(y)$.
+The following code sample illustrates the procdure (with $N = 10000$ and $M = 10$).
+\begin{verbatim}
+  x = sample(x_labels, p_x, 10000)
+    y = np.array([])
+    for i in range(len(x)):
+        if x[i] == 1:
+            q = p_y_x[0,]
+        else:
+            q = p_y_x[1,]
+
+        y = np.append(y, sample(y_labels, q, 10))
+
+    cnt_y = np.array([(y == 1).sum(), (y == 2).sum()])
+    p_y = cnt_y/len(y)
+    print('p(y) is: [%1.2f, %1.2f]'%(p_y[0], p_y[1]))
+
+\end{verbatim}
+
+
 \end{document}
