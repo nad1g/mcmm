@@ -47,23 +47,23 @@ def sample(labels, p, N):
 
 
 if __name__ == '__main__':
-    y_labels = np.array([1,2])
-    x_labels = np.array([1,2])
+    y_labels = np.array([0,1])
+    x_labels = np.array([0,1])
 
     """
        p_x = p(x)
-       p(x == 1) = 0.6 and p(x == 2) = 0.4
+       p(x == 0) = 0.6 and p(x == 1) = 0.4
     """
 
     p_x = np.array([0.6,0.4])
 
     """
        p_y_x = p(y|x)
-       p(y|x = 1) = 0.1, y == 1
-                  = 0.9, y == 2
+       p(y|x = 0) = 0.1, y == 0
+                  = 0.9, y == 1
 
-       p(y|x = 2) = 0.7, y == 1
-                  = 0.3, y == 2
+       p(y|x = 1) = 0.7, y == 0
+                  = 0.3, y == 1
     """
 
     p_y_x = np.array([[0.1,0.9],[0.7,0.3]])
@@ -71,8 +71,8 @@ if __name__ == '__main__':
     """
     Task 1: We wish to determine p(y)
             By the "law of total probability", we have
-            p(y == 1) = 0.1 * 0.6 + 0.7 * 0.4 = 0.34
-            p(y == 2) = (1 - 0.34) = 0.66
+            p(y == 0) = 0.1 * 0.6 + 0.7 * 0.4 = 0.34
+            p(y == 1) = (1 - 0.34) = 0.66
 
             For doing this the "Monte Carlo" way, we first
             simulate a bunch of 'x's according to p(x)
@@ -83,36 +83,32 @@ if __name__ == '__main__':
     x = sample(x_labels, p_x, 10000)
     y = np.array([])
     for i in range(len(x)):
-        if x[i] == 1:
-            q = p_y_x[0,]
-        else:
-            q = p_y_x[1,]
-
+        q = p_y_x[x[i],]
         y = np.append(y, sample(y_labels, q, 10))
 
-    cnt_y = np.array([(y == 1).sum(), (y == 2).sum()])
+    cnt_y = np.array([(y == 0).sum(), (y == 1).sum()])
     p_y = cnt_y/len(y)
     print('p(y) is: [%1.2f, %1.2f]'%(p_y[0], p_y[1]))
 
     """
     Task 2: Sample from posterior. We wish to determine
-            p(x|y); say, p(x == 1 | y = 1), p(x == 2| y = 1)
+            p(x|y); say, p(x == 0 | y = 0), p(x == 1| y = 0)
             This is easily done by applying Bayes' theorem
             p(x|y) = p(y|x) p(x) / sum_x (p(y|x) p(x))
             e.g.:
-            p(x == 1| y = 1) = p(y == 1| x = 1) p(x == 1)
+            p(x == 0| y = 0) = p(y == 0| x = 0) p(x == 0)
                               ----------------------------
-              (p(y == 1| x = 1) p(x == 1) + p(y == 1| x = 2) p(x == 2))
+              (p(y == 0| x = 0) p(x == 0) + p(y == 0| x = 1) p(x == 1))
 
               = 0.1 * 0.6 / (0.1 * 0.6 + 0.7 * 0.4) = 0.06 / 0.34 = 0.176
 
              and,
-             p(x == 2| y = 1) = (1 - 0.176) = 0.823
+             p(x == 1| y = 0) = (1 - 0.176) = 0.823
 
              similarly,
-             p(x == 1| y = 2) = 0.9 * 0.6/(0.9 * 0.6 + 0.3 * 0.4) = 0.818
+             p(x == 0| y = 1) = 0.9 * 0.6/(0.9 * 0.6 + 0.3 * 0.4) = 0.818
              and
-             p(x == 2| y = 2) = (1 - 0.818) = 0.182
+             p(x == 1| y = 1) = (1 - 0.818) = 0.182
 
              ---------
 
@@ -126,20 +122,15 @@ if __name__ == '__main__':
     x = sample(x_labels, p_x, 10000)
     x_new = np.array([])
     for i in range(len(x)):
-        if x[i] == 1:
-            q = p_y_x[0,]
-        else:
-            q = p_y_x[1,]
-
+        q = p_y_x[x[i],]
         y = sample(y_labels, q, 1)
-
-        if y == 1:
+        if y == 0:
             x_new = np.append(x_new, x[i])
 
     #done! now, check the distribution
-    cnt_x_new = np.array([(x_new == 1).sum(), (x_new == 2).sum()])
-    p_x_y1 = cnt_x_new / len(x_new)
-    print('p(x|y=1) is: [%1.2f, %1.2f]'%(p_x_y1[0], p_x_y1[1]))
+    cnt_x_new = np.array([(x_new == 0).sum(), (x_new == 1).sum()])
+    p_x_y0 = cnt_x_new / len(x_new)
+    print('p(x|y=0) is: [%1.2f, %1.2f]'%(p_x_y0[0], p_x_y0[1]))
     print('INFO: len(x) = %d, len(x_new) = %d'%(len(x), len(x_new)))
 
 
