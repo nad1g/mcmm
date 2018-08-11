@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{xfrac, nicefrac}
 \usepackage{multirow}
+\usepackage{appendix}
+
 \begin{document}
 \title{Monte Carlo Methods for Mortals}
 \author{Santhosh Nadig}
@@ -30,7 +32,7 @@ The expected value (mean, for ordinary mortals) of a random variable, $X$, is de
 \[
 E[X] = \int x~ p(x)~ dx,
 \]
-where $p(x)$ is the probability density function (pdf). Assume that $p(x)$ represents a Normal distribution (or Gaussian distribution) with mean $m$ and standard deviation $\sigma$. Thus, the probability $P(X = x) = p(x)$ is given by
+where $p(x)$ is the probability density function (pdf). Assume that $p(x)$ represents a Normal distribution (or Gaussian distribution) with mean $m$ and standard deviation $\sigma$. Thus, the probability density function $p(x)$ is given by
 \[
  p(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp\biggl({-(x-m)^2/(2\sigma^2)}\biggr).
 \]
@@ -124,7 +126,7 @@ The above example had a discrete pdf (a probabilty mass function (pmf)). If we a
 Just a quick recap; the first idea ({\bf I1}) says that integrals of the kind (\ref{eq:gxfx}) can be approximated by averaging $g(x)$ s evaluated at $x$s drawn from the pdf $f(x)$. The second idea ({\bf I2}) says that samples from one distribution (such as uniform distribution, which is provided as a standard library in most OSes) can be used to generate samples from another distribution.
 
 \subsection{Conditional Probabilty}
-In this section, we explore how to generate samples from a pdf as a function of other pdfs. I will use the term probability density function (which, if you remember, is applicable to a continuous random variable) instead of probability mass function (of a discrete random variable) just for convinience. I know that this violates mathematical rigour, but it is worth the sacrifice (in my opinion).
+In this section, we explore how to generate samples from a pdf as a function of other pdfs. I will use the term probability density function (which, if you remember, is applicable to a continuous random variable) instead of probability mass function (of a discrete random variable) just for convinience \footnote{see appendix \ref{app:a}}. I know that this violates mathematical rigour, but it is worth the sacrifice (in my opinion). 
 \subsubsection{Task 1}
 Assume that we are given samples from a pdf $p(x)$ and we know the conditional pdf $p(y|x)$. Our task is to generate samples from the pdf $p(y)$. So, say that we have samples $x_1, x_2, \dots, x_N$ from the pdf:
 \begin{align}
@@ -223,4 +225,19 @@ INFO: len(x) = 10000, len(x_new) = 3375
 \subsection{Recap}
 We have seen one way of generating samples from conditional probabilities (or sampling from the posterior probability). The method in the example we used discarded samples from a set of candidates (generated using the prior pdf) to generate another set of samples which were distributed according to the posterior pdf. If this method is applied recursively, one may end up with too few (or even no) samples. However, there are ways to overcome this problem.
 
+
+\begin{appendices}
+\section{Probability Density Function and Probability Mass Function}
+\label{app:a}
+It is easy to be misled\footnote{I, for one was...} to interpret the probability density function (pdf) of a continuous random variable as an analog of the probability mass function (pmf) of a discrete random variable. That is to say, that the ``y'' axis of the pdf represents probability. This is absolutely wrong! This confusion may arise, for example, when one compares the expression for the expected value of a discrete random variable $y$ and that of a continuous random variable $x$
+\begin{align}
+E[x] = \int x p(x) dx \\
+E[y] = \sum_i y_i p(y_i)
+\end{align}
+In the case of a continuous random variable $p(y_i)$ represents an actual probability. That is, $p(y_i) = Pr(Y = y_i)$; whereas for a continuous random variable $p(x)$ is the probability density (and not an actual probability). That is:
+\begin{align}
+Pr(a \le X \le b) = \int_{a}^b p(x) dx.
+\end{align}
+From the above expression it also follows that the probability of a continous random variable taking on exactly one particular value is  0. 
+\end{appendices}
 \end{document}
